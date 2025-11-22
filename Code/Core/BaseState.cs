@@ -1,40 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace _Project.Scripts.Infrastructure.SM
+namespace UltimateStateMachine.Code.Core
 {
-    public abstract class BaseState
+    public abstract class BaseState<TState>: IState
+        where TState : class, IState
     {
-        private readonly StateMachine _stateMachine;
-        protected readonly List<ITransition> _transitions = new();
+        private readonly List<ITransition> _transitions = new();
+        
+        public Type GetStateType() => typeof(TState);
+        
+        public void AddTransition(ITransition transition) => _transitions.Add(transition);
+        public void RemoveTransition(ITransition transition) => _transitions.Remove(transition);
 
-        protected BaseState(StateMachine stateMachine)
-        {
-            _stateMachine = stateMachine;
-        }
-
-        public bool CheckTransitions()
+        public bool TryTransit(IChangeStateStateMachine stateMachine)
         {
             for (var i = 0; i < _transitions.Count; i++)
             {
-                var hasTransition = _transitions[i].Check(_stateMachine);
-                if (hasTransition)
+                if (_transitions[i].TryTransit(stateMachine))
                     return true;
             }
 
             return false;
-        }
-
-        public void ChangeTransitionCondition(Type toStateType, Func<bool> newCondition)
-        {
-            for (var i = 0; i < _transitions.Count; i++)
-            {
-                var transition = _transitions[i];
-                if (transition.ToStateType != toStateType)
-                    continue;
-                
-                transition.ChangeCondition(newCondition);
-            }
         }
     }
 }

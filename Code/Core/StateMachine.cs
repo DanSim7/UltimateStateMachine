@@ -1,66 +1,91 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
-using Zenject;
 
-namespace _Project.Scripts.Infrastructure.SM
+namespace UltimateStateMachine.Code.Core
 {
-    public abstract class StateMachine : IInitializable, ITickable
+    public interface IChangeStateStateMachine
     {
-        public event Action<BaseState, BaseState> OnStateChanged;
-        public BaseState CurrentState { get; private set; }
-        
-        private Dictionary<Type, BaseState> _states;
-        private BaseState _previousState;
+        void ChangeState<TState>()
+            where TState : class, IEnterState;
+        void ChangeState<TState, TPayload>(TPayload payload)
+            where TState : class, IEnterStateWithPayload<TPayload> 
+            where TPayload : class;
+    }
 
-        public virtual void Initialize()
+    public interface IStateMachine : IChangeStateStateMachine
+    {
+        event Action<IState, IState> OnStateChanged;
+        
+        IState CurrentState { get; }
+
+        TState GetState<TState>() where TState : class, IState;
+        void Update();
+        void Stop();
+    }
+    
+    public abstract class StateMachine : IStateMachine
+    {
+        public event Action<IState, IState> OnStateChanged;
+        public IState CurrentState { get; private set; }
+        
+        private readonly Dictionary<Type, IState> _states = new();
+        private IState _previousState;
+
+        protected StateMachine(List<IState> states)
         {
-            _states = InitStates();
+            for (int i = 0; i < states.Count; i++) 
+                _states.Add(states[i].GetType(), states[i]);
         }
 
-        protected abstract Dictionary<Type, BaseState> InitStates();
-
-        public void Enter<TState>() where TState : BaseState
+        public void ChangeState<TState>()
+            where TState : class, IEnterState
         {
-            var state = ChangeState<TState>();
-            if (state is IEnterableState enterableState)
-                enterableState.Enter();
+            var state = SetCurrentState<TState>();
+            state.OnEnter();
             
             OnStateChanged?.Invoke(state, _previousState);
         }
 
-        public void Enter<TState, TParameter>(TParameter parameter) where TState : BaseState, IParameterEnterableState<TParameter>
+        public void ChangeState<TState, TPayload>(TPayload payload)
+            where TState : class, IEnterStateWithPayload<TPayload> 
+            where TPayload : class
         {
-            var state = ChangeState<TState>();
-            state.Enter(parameter);
+            var state = SetCurrentState<TState>();
+            state.OnEnter(payload);
             
             OnStateChanged?.Invoke(state, _previousState);
         }
-        
-        public void Stop()
-        {
-            if (CurrentState is IExitableState exitableState)
-                exitableState.Exit();
 
-            CurrentState = null;
-        }
+        public TState GetState<TState>() where TState : class, IState => 
+            _states[typeof(TState)] as TState;
 
-        public void Tick()
+        public void Update()
         {
             var currentState = CurrentState;
             if (currentState == null)
                 return;
             
-            var hasTransition = currentState.CheckTransitions();
+            if (currentState is IUpdateState updateState)
+                updateState.OnUpdate();
             
-            if (!hasTransition && CurrentState is IUpdateableState updateableState) 
-                updateableState.Update();
+            var hasTransition = currentState.TryTransit(this);
+            
+            if (!hasTransition && CurrentState is IPostUpdateState postUpdateState) 
+                postUpdateState.OnPostUpdate();
         }
 
-        private TState ChangeState<TState>() where TState : BaseState
+        public void Stop()
         {
-            if (CurrentState is IExitableState exitableState)
-                exitableState.Exit();
+            if (CurrentState is IExitState exitState)
+                exitState.OnExit();
+
+            CurrentState = null;
+        }
+
+        private TState SetCurrentState<TState>() where TState : class, IState
+        {
+            if (CurrentState is IExitState exitState)
+                exitState.OnExit();
       
             var state = GetState<TState>();
             _previousState = CurrentState;
@@ -69,8 +94,5 @@ namespace _Project.Scripts.Infrastructure.SM
       
             return state;
         }
-
-        public TState GetState<TState>() where TState : BaseState => 
-            _states[typeof(TState)] as TState;
     }
 }

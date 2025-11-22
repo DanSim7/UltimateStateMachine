@@ -1,6 +1,7 @@
-﻿using Zenject;
+﻿using UltimateStateMachine.Code.Core;
+using Zenject;
 
-namespace _Project.Scripts.Infrastructure.SM
+namespace UltimateStateMachine.Code.ZenjectSupport
 {
     public class StateFactory
     {
@@ -9,7 +10,7 @@ namespace _Project.Scripts.Infrastructure.SM
         public StateFactory(DiContainer container) =>
             _container = container;
 
-        public T CreateState<T>() where T : BaseState =>
+        public T CreateState<T>() where T : IState =>
             _container.Resolve<T>();
     }
 }
