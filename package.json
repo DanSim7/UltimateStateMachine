@@ -1,0 +1,42 @@
+﻿{
+  "name": "com.dansim.statemachine",
+  "author":
+  {
+    "name": "Danil Simonov",
+    "url": "https://t.me/dansim7"
+  },
+  "displayName": "Ultimate State Machine",
+  "description": "This is a lightweight flexible State Machine",
+  "unity": "2021.3",
+  "version": "1.0.0",
+  "keywords": [
+    "ultimatestatemachine",
+    "finitestatemachine",
+    "statemachine",
+    "usm",
+    "fsm",
+    "sm",
+    "pattern",
+    "dansim",
+    "danilsimonov",
+    "performance",
+    "zenject",
+    "extenject",
+    "di",
+    "zenjectstatemachine",
+    "distatemachine"
+  ],
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DanSim7/UltimateStateMachine.git"
+  },
+  "license": "MIT",
+  "samples": [
+    {
+      "displayName": "GameStateMachine with Zenject",
+      "description": "Example of using global Game State Machine with come states and binding in Zenject Installer",
+      "path": "Samples~/ZenjectGameStateMachine"
+    }
+  ]
+}

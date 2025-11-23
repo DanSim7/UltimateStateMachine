@@ -1,9 +1,15 @@
-﻿using UltimateStateMachine.Code.Core;
+﻿#if ZENJECT
+using DanSim.UltimateStateMachine.Core;
 using Zenject;
 
-namespace UltimateStateMachine.Code.ZenjectSupport
+namespace DanSim.UltimateStateMachine.ZenjectSupport
 {
-    public class StateFactory
+    public interface IStateFactory
+    {
+        T CreateState<T>() where T : IState;
+    }
+    
+    public class StateFactory : IStateFactory
     {
         private readonly DiContainer _container;
 
@@ -14,3 +20,4 @@ namespace UltimateStateMachine.Code.ZenjectSupport
             _container.Resolve<T>();
     }
 }
+#endif

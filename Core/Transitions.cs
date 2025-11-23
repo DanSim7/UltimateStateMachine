@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UltimateStateMachine.Code.Core
+namespace DanSim.UltimateStateMachine.Core
 {
     public interface ITransition
     {

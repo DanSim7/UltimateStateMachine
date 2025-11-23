@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace UltimateStateMachine.Code.Core
+namespace DanSim.UltimateStateMachine.Core
 {
     public interface IState
     {
@@ -25,14 +25,14 @@ namespace UltimateStateMachine.Code.Core
     {
         void OnExit();
     }
+    
+    public interface IPreUpdateState
+    {
+        void OnPreUpdate();
+    }
 
     public interface IUpdateState
     {
         void OnUpdate();
-    }
-
-    public interface IPostUpdateState
-    {
-        void OnPostUpdate();
     }
 }

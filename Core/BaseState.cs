@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UltimateStateMachine.Code.Core
+namespace DanSim.UltimateStateMachine.Core
 {
     public abstract class BaseState<TState>: IState
         where TState : class, IState

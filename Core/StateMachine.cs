@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using DanSim.UltimateStateMachine.ZenjectSupport;
 
-namespace UltimateStateMachine.Code.Core
+namespace DanSim.UltimateStateMachine.Core
 {
     public interface IChangeStateStateMachine
     {
@@ -26,16 +27,17 @@ namespace UltimateStateMachine.Code.Core
     public abstract class StateMachine : IStateMachine
     {
         public event Action<IState, IState> OnStateChanged;
-        public IState CurrentState { get; private set; }
-        
+
+        private readonly IStateFactory _stateFactory;
         private readonly Dictionary<Type, IState> _states = new();
         private IState _previousState;
 
-        protected StateMachine(List<IState> states)
+        protected StateMachine(IStateFactory stateFactory)
         {
-            for (int i = 0; i < states.Count; i++) 
-                _states.Add(states[i].GetType(), states[i]);
+            _stateFactory = stateFactory;
         }
+
+        public IState CurrentState { get; private set; }
 
         public void ChangeState<TState>()
             where TState : class, IEnterState
@@ -65,13 +67,13 @@ namespace UltimateStateMachine.Code.Core
             if (currentState == null)
                 return;
             
-            if (currentState is IUpdateState updateState)
-                updateState.OnUpdate();
+            if (currentState is IPreUpdateState updateState)
+                updateState.OnPreUpdate();
             
             var hasTransition = currentState.TryTransit(this);
             
-            if (!hasTransition && CurrentState is IPostUpdateState postUpdateState) 
-                postUpdateState.OnPostUpdate();
+            if (!hasTransition && CurrentState is IUpdateState postUpdateState) 
+                postUpdateState.OnUpdate();
         }
 
         public void Stop()
@@ -82,7 +84,14 @@ namespace UltimateStateMachine.Code.Core
             CurrentState = null;
         }
 
-        private TState SetCurrentState<TState>() where TState : class, IState
+        protected void AddState<TState>()
+            where TState : class, IState
+        {
+            _states.Add(typeof(TState), _stateFactory.CreateState<TState>());
+        }
+
+        private TState SetCurrentState<TState>() 
+            where TState : class, IState
         {
             if (CurrentState is IExitState exitState)
                 exitState.OnExit();
