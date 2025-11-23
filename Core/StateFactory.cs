@@ -1,23 +1,24 @@
 ﻿#if ZENJECT
-using DanSim.UltimateStateMachine.Core;
 using Zenject;
+#endif
 
-namespace DanSim.UltimateStateMachine.ZenjectSupport
+namespace DanSim.UltimateStateMachine.Core
 {
     public interface IStateFactory
     {
         T CreateState<T>() where T : IState;
     }
     
-    public class StateFactory : IStateFactory
+#if ZENJECT
+    public class ZenjectStateFactory : IStateFactory
     {
         private readonly DiContainer _container;
 
-        public StateFactory(DiContainer container) =>
+        public ZenjectStateFactory(DiContainer container) =>
             _container = container;
 
         public T CreateState<T>() where T : IState =>
             _container.Resolve<T>();
     }
-}
 #endif
+}

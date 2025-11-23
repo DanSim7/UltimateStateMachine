@@ -1,5 +1,4 @@
-﻿using DanSim.UltimateStateMachine.ZenjectSupport;
-using Zenject;
+﻿using Zenject;
 
 namespace DanSim.UltimateStateMachine.Sample.ZenjectGameStateMachine
 {
@@ -14,7 +13,7 @@ namespace DanSim.UltimateStateMachine.Sample.ZenjectGameStateMachine
 
         private void BindStateFactory()
         {
-            Container.BindInterfacesTo<StateFactory>().AsSingle();
+            Container.BindInterfacesTo<ZenjectStateFactory>().AsSingle();
         }
 
         private void BindStates()
@@ -26,7 +25,7 @@ namespace DanSim.UltimateStateMachine.Sample.ZenjectGameStateMachine
 
         private void BindStateMachine()
         {
-            Container.BindInterfacesAndSelfTo<GameStateMachine>().AsSingle();
+            Container.BindInterfacesAndSelfTo<GameStateMachine>().AsSingle().NonLazy();
         }
     }
 }

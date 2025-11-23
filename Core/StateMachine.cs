@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using DanSim.UltimateStateMachine.ZenjectSupport;
 
 namespace DanSim.UltimateStateMachine.Core
 {
@@ -23,7 +22,7 @@ namespace DanSim.UltimateStateMachine.Core
         void Update();
         void Stop();
     }
-    
+
     public abstract class StateMachine : IStateMachine
     {
         public event Action<IState, IState> OnStateChanged;

@@ -1,6 +1,5 @@
 ﻿using System;
 using DanSim.UltimateStateMachine.Core;
-using DanSim.UltimateStateMachine.ZenjectSupport;
 using Zenject;
 
 namespace DanSim.UltimateStateMachine.Sample.ZenjectGameStateMachine
