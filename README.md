@@ -84,7 +84,7 @@ Container.Bind<IStateFactory>().To<ZenjectStateFactory>().AsSingle();
 # 🎯 Quick Start
 ## 1. Define Your States
    ```csharp
-public interface IExampleBootService
+    public interface IExampleBootService
     {
         void Load(Action onLoaded);
     }
